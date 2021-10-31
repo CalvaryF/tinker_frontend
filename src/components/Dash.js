@@ -10,11 +10,11 @@ const DashMain = styled.div`
   justify-content: center;
 `;
 
-const Viewport = styled.div`
+const DataCard = styled.div`
   box-sizing: border-box;
   height: 95vh;
   overflow: auto;
-  width: 60vw;
+  width: 55vw;
   margin: 1vw;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
     rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
@@ -25,6 +25,23 @@ const Viewport = styled.div`
     width: 0 !important;
   }
 `;
+
+const ValuesDiv = styled.div`
+  //background-color: #eee;
+  padding: 30px;
+  font-size: 20px;
+`;
+
+const ControlCard = styled.div`
+  height: 95vh;
+  width: 25vw;
+  background-color: white;
+  margin: 1vw 1vw 1vw 0vw;
+  border-radius: 10px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+    rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+`;
+
 const Line = styled.div`
   height: 1px;
   position: relative;
@@ -57,11 +74,10 @@ const Content = styled.div`
 `;
 
 const GraphOuter = styled.div`
-  height: 600px;
   width: 100%;
   // background-color: #fee;
   display: grid;
-  grid-template-columns: 700px 1fr;
+  grid-template-columns: 6fr 2fr;
 `;
 
 const DataOuter = styled.div`
@@ -69,18 +85,21 @@ const DataOuter = styled.div`
 `;
 
 const GraphDiv = styled.div`
-  background-color: #f3f3f3;
-  padding: 50px;
+  background-color: #fafafa;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  border: 1px solid #eee;
 `;
 
 const ControlsDiv = styled.div`
   padding: 50px;
 `;
 
-export default function Home({ graph, controls, data }) {
+export default function Home({ graph, controls, data, columns }) {
   return (
     <DashMain>
-      <Viewport>
+      <DataCard>
         <Header>
           <HeaderText>Gaussian Samples</HeaderText>
         </Header>
@@ -89,7 +108,7 @@ export default function Home({ graph, controls, data }) {
             <GraphDiv>
               <Graph graph={graph}></Graph>
             </GraphDiv>
-            <ControlsDiv>{controls}</ControlsDiv>
+            <ValuesDiv>Values</ValuesDiv>
           </GraphOuter>
         </Content>
         <Line></Line>
@@ -98,10 +117,13 @@ export default function Home({ graph, controls, data }) {
         </Header>
         <Content>
           <DataOuter>
-            <Table data={data} />
+            <Table columns={columns} data={data} />
           </DataOuter>
         </Content>
-      </Viewport>
+      </DataCard>
+      <ControlCard>
+        <ControlsDiv>{controls}</ControlsDiv>
+      </ControlCard>
     </DashMain>
   );
 }

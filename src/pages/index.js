@@ -1,12 +1,27 @@
 import React, { useState, useEffect } from "react";
-const endpoint = "HTTP://127.0.0.1:8000/distributions/randomnormal";
+const endpoint = "HTTP://127.0.0.1:8000/correlation/randomcorrelation";
 import Dash from "../components/Dash";
-import { Histogram } from "../components/graphs/histogram";
+import { Scatterplot } from "../components/graphs/scatterplot";
 
 export default function Home() {
+  var w;
+  var h;
+  if (typeof window !== "undefined") {
+    w = window.innerWidth;
+    h = window.innerHeight;
+  }
+  const updateWidthAndHeight = () => {
+    setWidth(window.innerWidth);
+    console.log(width);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateWidthAndHeight);
+    return () => window.removeEventListener("resize", updateWidthAndHeight);
+  });
   //state
+  const [width, setWidth] = useState(w);
   const [data, setData] = useState([0]);
-  const [size, setSize] = useState(1000);
+  const [size, setSize] = useState(500);
   const [bins, setBins] = useState(50);
   const [render, setRender] = useState(false);
   const [graph, setgr] = useState(50);
@@ -29,7 +44,7 @@ export default function Home() {
         fetch(endpoint, requestOptions)
           .then((response) => response.json())
           .then((d) => {
-            setData(d.randomnormal);
+            setData(d.randomcorrelation);
           });
       }
     })();
@@ -38,18 +53,24 @@ export default function Home() {
   //create graph
   useEffect(() => {
     setgr(
-      Histogram(data, {
-        height: 500,
+      Scatterplot(data, {
+        x: (d) => d[0],
+        y: (d) => d[1],
+        height: width / 2.5,
+        width: width / 2,
         color: "steelblue",
-        thresholds: bins,
-        domain: [-5, 5],
-        yDomain: [0, (size / bins) * 6],
+        xDomain: [-5, 5],
+        yDomain: [-5, 5],
+        fill: "steelblue",
+        stroke: "none",
+        r: 5,
       })
     );
-  }, [data, bins]);
+  }, [data, bins, width]);
 
   //get new data
   const reRender = () => {
+    console.log(data);
     setRender(!render);
   };
 
@@ -57,6 +78,7 @@ export default function Home() {
     <>
       <Dash
         data={data}
+        columns={[0, 0]}
         graph={graph}
         controls={
           <div>

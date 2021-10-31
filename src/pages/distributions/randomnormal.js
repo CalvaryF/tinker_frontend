@@ -1,13 +1,32 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
+const endpoint = "HTTP://127.0.0.1:8000/distributions/randomnormal";
+import Dash from "../../components/Dash";
 import { Histogram } from "../../components/graphs/histogram";
-import d3, { arc, pie, scaleBand, scaleLinear, max, select } from "d3";
 
-export default function Home({ data, done }) {
-  const [normal, setNormal] = useState([0]);
+export default function Home() {
+  var w;
+  var h;
+  if (typeof window !== "undefined") {
+    w = window.innerWidth;
+    h = window.innerHeight;
+  }
+  const updateWidthAndHeight = () => {
+    setWidth(window.innerWidth);
+    console.log(width);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateWidthAndHeight);
+    return () => window.removeEventListener("resize", updateWidthAndHeight);
+  });
+  //state
+  const [width, setWidth] = useState(w);
+  const [data, setData] = useState([0]);
   const [size, setSize] = useState(1000);
   const [bins, setBins] = useState(50);
   const [render, setRender] = useState(false);
+  const [graph, setgr] = useState(50);
 
+  //fetch data
   useEffect(() => {
     (async () => {
       if (isNaN(parseInt(size))) {
@@ -22,71 +41,53 @@ export default function Home({ data, done }) {
             size: parseInt(size),
           }),
         };
-        fetch(
-          "HTTP://127.0.0.1:8000/distributions/randomnormal",
-          requestOptions
-        )
+        fetch(endpoint, requestOptions)
           .then((response) => response.json())
-          .then((data) => {
-            setNormal(data.randomnormal);
+          .then((d) => {
+            setData(d.randomnormal);
           });
       }
     })();
   }, [size, render]);
 
+  //create graph
   useEffect(() => {
-    setNormal([1]);
-  }, []);
+    setgr(
+      Histogram(data, {
+        height: width / 2.5,
+        width: width / 2,
+        color: "steelblue",
+        thresholds: bins,
+        domain: [-5, 5],
+        yDomain: [0, (size / bins) * 6],
+      })
+    );
+  }, [data, bins, width]);
 
-  const containerRef = useRef(null);
-
-  useLayoutEffect(() => {
-    //get ref
-    const div = select(containerRef.current);
-    //create some shit
-    const sv = Histogram(normal, {
-      height: 500,
-      color: "steelblue",
-      thresholds: bins,
-      domain: [-5, 5],
-      yDomain: [0, (size / bins) * 6],
-    });
-
-    //append the shit to the ref
-    div
-      .selectAll("span")
-      .data([1])
-      .join(
-        (enter) => enter.append("span"),
-        (update) => update.append("span").append(() => sv),
-        (exit) => exit.remove()
-      );
-  }, [normal, bins]);
-
-  //generate normal data
+  //get new data
   const reRender = () => {
     setRender(!render);
   };
+
   return (
     <>
-      <div ref={containerRef}></div>
-      <h1>Gaussian Samples</h1>
-      <button onClick={reRender}>Generate</button>
-      <br />
-      <br />
-      <input
-        onChange={(e) => setSize(e.target.value)}
-        type="text"
-        name="name"
-      />
-
-      <br />
-      <br />
-      {normal.map((i, key) => (
-        <div key={key} className="user">
-          {i}
-        </div>
-      ))}
+      <Dash
+        data={data}
+        columns={[0]}
+        graph={graph}
+        controls={
+          <div>
+            <button onClick={reRender}>Generate</button>
+            <br />
+            <br />
+            <input
+              onChange={(e) => setSize(e.target.value)}
+              type="text"
+              name="name"
+            />
+          </div>
+        }
+      ></Dash>
     </>
   );
 }

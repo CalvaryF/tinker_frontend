@@ -11,6 +11,7 @@ const DataTable = styled.table`
   font-family: sans-serif;
   width: 100%;
   border-spacing: 0px;
+  overflow: hidden;
 
   tr {
     td {
@@ -32,6 +33,7 @@ const DataTable = styled.table`
       padding: 20px;
       border-left: 1px solid #ddd;
       background-color: #f3f3f3;
+      background-color: #f3f3f3;
       border-top: none;
       :first-child {
         border-left: none;
@@ -47,14 +49,21 @@ export default function Table({ columns, data }) {
       <thead>
         <tr>
           <th>n</th>
-          <th>Sample</th>
+          {columns.map((i, key) => (
+            <th key={key}> Sample</th>
+          ))}
         </tr>
       </thead>
       <tbody>
-        {data.map((i, key) => (
+        {data.map((datapoint, key) => (
           <tr key={key}>
             <td>{key}</td>
-            <td> {i}</td>
+            {columns.map((i, key) => (
+              <td key={key}>
+                {" "}
+                {columns.length > 1 ? datapoint[key] : datapoint}
+              </td>
+            ))}
           </tr>
         ))}
       </tbody>
