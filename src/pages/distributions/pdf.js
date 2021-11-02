@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-const endpoint = "HTTP://127.0.0.1:8000/correlation/randomcorrelation";
-import Dash from "../components/Dash";
-import { Scatterplot } from "../components/graphs/scatterplot";
+const endpoint = "HTTP://127.0.0.1:8000/distributions/pdf";
+import Dash from "../../components/Dash";
+import { Scatterplot } from "../../components/graphs/scatterplot";
 
 export default function Home() {
   var w;
@@ -46,7 +46,7 @@ export default function Home() {
         fetch(endpoint, requestOptions)
           .then((response) => response.json())
           .then((d) => {
-            setData(d.randomcorrelation);
+            setData(d.pdf);
           });
       }
     })();
@@ -62,7 +62,7 @@ export default function Home() {
         width: width / 2,
         color: "steelblue",
         xDomain: [-5, 5],
-        yDomain: [-5, 5],
+        yDomain: [0, 120],
         fill: "steelblue",
         stroke: "none",
         r: 5,

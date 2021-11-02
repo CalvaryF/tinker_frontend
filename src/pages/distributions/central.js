@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-const endpoint = "HTTP://127.0.0.1:8000/correlation/randomcorrelation";
-import Dash from "../components/Dash";
-import { Scatterplot } from "../components/graphs/scatterplot";
+const endpoint = "HTTP://127.0.0.1:8000/distributions/clt";
+import Dash from "../../components/Dash";
+import { Histogram } from "../../components/graphs/histogram";
 
 export default function Home() {
   var w;
@@ -21,8 +21,9 @@ export default function Home() {
   //state
   const [width, setWidth] = useState(w);
   const [data, setData] = useState([0]);
-  const [size, setSize] = useState(500);
-  const [cov, setCov] = useState(0.9);
+  const [samplemeans, setSamplemeans] = useState(1000);
+  const [samplesize, setSamplesize] = useState(100);
+  const [confidencelevel, setConfidencelevel] = useState(95);
   const [bins, setBins] = useState(50);
   const [render, setRender] = useState(false);
   const [graph, setgr] = useState(50);
@@ -30,66 +31,72 @@ export default function Home() {
   //fetch data
   useEffect(() => {
     (async () => {
-      if (isNaN(parseInt(size))) {
+      if (isNaN(parseInt(samplesize))) {
         console.log("please enter a number");
-      } else if (size > 10000) {
+      } else if (samplesize > 10000) {
         console.log("please enter a sample size less than 10000");
       } else {
         const requestOptions = {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            size: parseInt(size),
-            cov: parseFloat(cov),
+            samplemeans: parseInt(samplemeans),
+            samplesize: parseInt(samplesize),
+            confidencelevel: parseInt(confidencelevel),
           }),
         };
         fetch(endpoint, requestOptions)
           .then((response) => response.json())
           .then((d) => {
-            setData(d.randomcorrelation);
+            setData(d.means);
           });
       }
     })();
-  }, [size, render]);
+  }, [samplesize, render, samplemeans]);
 
   //create graph
   useEffect(() => {
     setgr(
-      Scatterplot(data, {
-        x: (d) => d[0],
-        y: (d) => d[1],
+      Histogram(data, {
         height: width / 2.5,
         width: width / 2,
         color: "steelblue",
-        xDomain: [-5, 5],
-        yDomain: [-5, 5],
-        fill: "steelblue",
-        stroke: "none",
-        r: 5,
+        thresholds: bins,
+        domain: [-10, 10],
+        yDomain: [0, (samplemeans / bins) * 20],
       })
     );
   }, [data, bins, width]);
 
   //get new data
   const reRender = () => {
-    console.log(data);
     setRender(!render);
   };
 
   return (
     <>
       <Dash
-        title="Correlation"
+        title="Normal Distribution"
         data={data}
-        columns={[0, 0]}
+        columns={[0]}
         graph={graph}
         controls={
           <div>
             <button onClick={reRender}>Generate</button>
             <br />
             <br />
+            <div>Sample Size</div>
+            <br />
             <input
-              onChange={(e) => setSize(e.target.value)}
+              onChange={(e) => setSamplesize(e.target.value)}
+              type="text"
+              name="name"
+            />
+            <br /> <br />
+            <div>Sample Means</div>
+            <br />
+            <input
+              onChange={(e) => setSamplemeans(e.target.value)}
               type="text"
               name="name"
             />

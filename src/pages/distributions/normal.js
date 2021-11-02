@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-const endpoint = "HTTP://127.0.0.1:8000/distributions/randomnormal";
+const endpoint = "HTTP://127.0.0.1:8000/distributions/normal";
 import Dash from "../../components/Dash";
 import { Histogram } from "../../components/graphs/histogram";
 
@@ -22,6 +22,7 @@ export default function Home() {
   const [width, setWidth] = useState(w);
   const [data, setData] = useState([0]);
   const [size, setSize] = useState(1000);
+  const [skew, setSkew] = useState(0);
   const [bins, setBins] = useState(50);
   const [render, setRender] = useState(false);
   const [graph, setgr] = useState(50);
@@ -39,16 +40,17 @@ export default function Home() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             size: parseInt(size),
+            skew: parseInt(skew),
           }),
         };
         fetch(endpoint, requestOptions)
           .then((response) => response.json())
           .then((d) => {
-            setData(d.randomnormal);
+            setData(d.normal);
           });
       }
     })();
-  }, [size, render]);
+  }, [size, render, skew]);
 
   //create graph
   useEffect(() => {
@@ -72,6 +74,7 @@ export default function Home() {
   return (
     <>
       <Dash
+        title="Normal Distribution"
         data={data}
         columns={[0]}
         graph={graph}
@@ -80,8 +83,18 @@ export default function Home() {
             <button onClick={reRender}>Generate</button>
             <br />
             <br />
+            <div>Sample Size</div>
+            <br />
             <input
               onChange={(e) => setSize(e.target.value)}
+              type="text"
+              name="name"
+            />
+            <br /> <br />
+            <div>Skew</div>
+            <br />
+            <input
+              onChange={(e) => setSkew(e.target.value)}
               type="text"
               name="name"
             />

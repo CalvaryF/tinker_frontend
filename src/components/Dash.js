@@ -96,12 +96,12 @@ const ControlsDiv = styled.div`
   padding: 50px;
 `;
 
-export default function Home({ graph, controls, data, columns }) {
+export default function Home({ graph, controls, data, columns, title }) {
   return (
     <DashMain>
       <DataCard>
         <Header>
-          <HeaderText>Gaussian Samples</HeaderText>
+          <HeaderText>{title}</HeaderText>
         </Header>
         <Content>
           <GraphOuter>

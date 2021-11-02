@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-const endpoint = "HTTP://127.0.0.1:8000/correlation/randomcorrelation";
-import Dash from "../components/Dash";
-import { Scatterplot } from "../components/graphs/scatterplot";
+const endpoint = "HTTP://127.0.0.1:8000/distributions/pareto";
+import Dash from "../../components/Dash";
+import { Histogram } from "../../components/graphs/histogram";
 
 export default function Home() {
   var w;
@@ -21,8 +21,7 @@ export default function Home() {
   //state
   const [width, setWidth] = useState(w);
   const [data, setData] = useState([0]);
-  const [size, setSize] = useState(500);
-  const [cov, setCov] = useState(0.9);
+  const [size, setSize] = useState(1000);
   const [bins, setBins] = useState(50);
   const [render, setRender] = useState(false);
   const [graph, setgr] = useState(50);
@@ -40,13 +39,12 @@ export default function Home() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             size: parseInt(size),
-            cov: parseFloat(cov),
           }),
         };
         fetch(endpoint, requestOptions)
           .then((response) => response.json())
           .then((d) => {
-            setData(d.randomcorrelation);
+            setData(d.pareto);
           });
       }
     })();
@@ -55,44 +53,42 @@ export default function Home() {
   //create graph
   useEffect(() => {
     setgr(
-      Scatterplot(data, {
-        x: (d) => d[0],
-        y: (d) => d[1],
+      Histogram(data, {
         height: width / 2.5,
         width: width / 2,
         color: "steelblue",
-        xDomain: [-5, 5],
-        yDomain: [-5, 5],
-        fill: "steelblue",
-        stroke: "none",
-        r: 5,
+        thresholds: bins,
+        domain: [0, 2],
+        yDomain: [0, (size / bins) * 8],
       })
     );
   }, [data, bins, width]);
 
   //get new data
   const reRender = () => {
-    console.log(data);
     setRender(!render);
   };
 
   return (
     <>
       <Dash
-        title="Correlation"
+        title="Pareto Distribution"
         data={data}
-        columns={[0, 0]}
+        columns={[0]}
         graph={graph}
         controls={
           <div>
             <button onClick={reRender}>Generate</button>
             <br />
             <br />
+            <div>Sample Size</div>
+            <br />
             <input
               onChange={(e) => setSize(e.target.value)}
               type="text"
               name="name"
             />
+            <br /> <br />
           </div>
         }
       ></Dash>
