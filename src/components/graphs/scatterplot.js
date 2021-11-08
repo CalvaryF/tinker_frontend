@@ -133,7 +133,7 @@ function Scatterplot(
       .attr("stroke", halo)
       .attr("stroke-width", haloWidth);
 
-  return svg.node();
+  return svg;
 }
 
 export { Scatterplot };
