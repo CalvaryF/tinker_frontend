@@ -64,7 +64,7 @@ export default function Home() {
         thresholds: bins,
         domain: [-10, 10],
         yDomain: [0, (samplemeans / bins) * 20],
-      })
+      }).node()
     );
   }, [data, bins, width]);
 

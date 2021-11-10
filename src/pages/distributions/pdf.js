@@ -66,7 +66,7 @@ export default function Home() {
         fill: "steelblue",
         stroke: "none",
         r: 5,
-      })
+      }).node()
     );
   }, [data, bins, width]);
 

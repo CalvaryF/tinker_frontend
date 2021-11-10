@@ -60,7 +60,7 @@ export default function Home() {
         thresholds: bins,
         domain: [0, 2],
         yDomain: [0, (size / bins) * 8],
-      })
+      }).node()
     );
   }, [data, bins, width]);
 

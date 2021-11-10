@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 const endpoint = "HTTP://127.0.0.1:8000/correlation/randomcorrelation";
-import Dash from "../../components/Dash";
-import { Scatterplot } from "../../components/graphs/scatterplot";
+import styled from "styled-components";
+import Dash from "../../components/Dash2";
+import { Scatterplot } from "../../components/graphs/scatterplot2";
+import * as d3 from "d3";
+import Graph from "../../components/Graph2";
 
 export default function Home() {
   var w;
@@ -20,46 +23,25 @@ export default function Home() {
   });
   //state
   const [width, setWidth] = useState(w);
-  const [data, setData] = useState([0]);
+  const [data, setData] = useState([
+    [0, 0],
+    [-3, -3],
+  ]);
   const [size, setSize] = useState(500);
   const [cov, setCov] = useState(0.9);
   const [bins, setBins] = useState(50);
   const [render, setRender] = useState(false);
   const [graph, setgr] = useState(50);
-
-  //fetch data
-  useEffect(() => {
-    (async () => {
-      if (isNaN(parseInt(size))) {
-        console.log("please enter a number");
-      } else if (size > 10000) {
-        console.log("please enter a sample size less than 10000");
-      } else {
-        const requestOptions = {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            size: parseInt(size),
-            cov: parseFloat(cov),
-          }),
-        };
-        fetch(endpoint, requestOptions)
-          .then((response) => response.json())
-          .then((d) => {
-            setData(d.randomcorrelation);
-          });
-      }
-    })();
-  }, [size, render]);
+  const containerRef = useRef(null);
 
   //create graph
   useEffect(() => {
     setgr(
-      Scatterplot(data, {
+      Scatterplot(data, setData, {
         x: (d) => d[0],
         y: (d) => d[1],
-        height: width / 2.5,
-        width: width / 2,
+        height: width / 3.333333333,
+        width: width / 3.3333333333,
         color: "steelblue",
         xDomain: [-5, 5],
         yDomain: [-5, 5],
@@ -75,7 +57,9 @@ export default function Home() {
     console.log(data);
     setRender(!render);
   };
-
+  function logData() {
+    console.log(data);
+  }
   return (
     <>
       <Dash

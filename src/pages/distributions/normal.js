@@ -62,7 +62,7 @@ export default function Home() {
         thresholds: bins,
         domain: [-5, 5],
         yDomain: [0, (size / bins) * 6],
-      })
+      }).node()
     );
   }, [data, bins, width]);
 

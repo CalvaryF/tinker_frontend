@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 const endpoint = "HTTP://127.0.0.1:8000/correlation/randomcorrelation";
 import Dash from "../../components/Dash";
-import { Scatterplot } from "../../components/graphs/scatterplot";
+import { Spline } from "../../components/graphs/spline";
 
 export default function Home() {
   var w;
@@ -27,46 +27,20 @@ export default function Home() {
   const [render, setRender] = useState(false);
   const [graph, setgr] = useState(50);
 
-  //fetch data
-  useEffect(() => {
-    (async () => {
-      if (isNaN(parseInt(size))) {
-        console.log("please enter a number");
-      } else if (size > 10000) {
-        console.log("please enter a sample size less than 10000");
-      } else {
-        const requestOptions = {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            size: parseInt(size),
-            cov: parseFloat(cov),
-          }),
-        };
-        fetch(endpoint, requestOptions)
-          .then((response) => response.json())
-          .then((d) => {
-            setData(d.randomcorrelation);
-          });
-      }
-    })();
-  }, [size, render]);
-
   //create graph
   useEffect(() => {
     setgr(
-      Scatterplot(data, {
-        x: (d) => d[0],
-        y: (d) => d[1],
-        height: width / 2.5,
-        width: width / 2,
-        color: "steelblue",
-        xDomain: [-5, 5],
-        yDomain: [-5, 5],
-        fill: "steelblue",
-        stroke: "none",
-        r: 5,
-      }).node()
+      Spline(
+        [
+          [100, 100],
+          [250, 300],
+          [120, 320],
+          [500, 70],
+        ],
+        600,
+        400,
+        "curveBasis"
+      ).node()
     );
   }, [data, bins, width]);
 
